@@ -74,57 +74,86 @@ public class ReproductorMain {
     public static void crearPlaylist() {
         clearScreen();
         System.out.println("=== Crear nueva playlist ===");
-        System.out.print("Nombre de la playlist: ");
-        String nombre = scanner.nextLine().trim();
+        while (true) {
+            try {
+                System.out.print("Nombre de la playlist: ");
+                String nombre = scanner.nextLine().trim();
+                if (nombre.isEmpty())
+                    throw new Exception("El nombre no puede estar vacío.");
 
-        if (nombre.isEmpty()) {
-            System.out.println("El nombre no puede estar vacío.");
-            return;
+                basePlaylists.agregarPlaylist(new Playlist(nombre));
+                System.out.println("Playlist creada correctamente.");
+                break;
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                pressEnterToContinue();
+                clearScreen();
+                System.out.println("=== Crear nueva playlist ===");
+            }
         }
-
-        basePlaylists.agregarPlaylist(new Playlist(nombre));
-        System.out.println("Playlist creada correctamente.");
         pressEnterToContinue();
     }
 
     public static void agregarCancionGeneral() {
         clearScreen();
         System.out.println("=== Agregar nueva canción ===");
-        System.out.print("Título: ");
-        String titulo = scanner.nextLine().trim();
-        if (titulo.isEmpty()) {
-            System.out.println("El título no puede estar vacío.");
-            return;
-        }
 
-        System.out.print("Artista: ");
-        String artista = scanner.nextLine().trim();
-        if (artista.isEmpty()) {
-            System.out.println("El artista no puede estar vacío.");
-            return;
-        }
-
+        String titulo = "";
+        String artista = "";
         int duracion = 0;
+
         while (true) {
-            System.out.print("Duración en segundos: ");
             try {
-                duracion = Integer.parseInt(scanner.nextLine());
-                if (duracion > 0)
-                    break;
-                else
-                    System.out.println("Ingrese un número mayor a 0.");
+                System.out.print("Título: ");
+                titulo = scanner.nextLine().trim();
+                if (titulo.isEmpty())
+                    throw new Exception("El título no puede estar vacío.");
+                break;
             } catch (Exception e) {
-                System.out.println("Entrada inválida. Solo se permiten números enteros.");
+                System.out.println("Error: " + e.getMessage());
+                pressEnterToContinue();
+                clearScreen();
+                System.out.println("=== Agregar nueva canción ===");
+            }
+        }
+
+        while (true) {
+            try {
+                System.out.print("Artista: ");
+                artista = scanner.nextLine().trim();
+                if (artista.isEmpty())
+                    throw new Exception("El artista no puede estar vacío.");
+                break;
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                pressEnterToContinue();
+                clearScreen();
+                System.out.println("=== Agregar nueva canción ===");
+            }
+        }
+
+        while (true) {
+            try {
+                System.out.print("Duración en segundos: ");
+                duracion = Integer.parseInt(scanner.nextLine());
+                if (duracion <= 0)
+                    throw new Exception("Ingrese un número mayor a 0.");
+                break;
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                pressEnterToContinue();
+                clearScreen();
+                System.out.println("=== Agregar nueva canción ===");
             }
         }
 
         if (baseCanciones.buscarCancion(titulo) != null) {
             System.out.println("Ya existe una canción con ese título.");
-            return;
+        } else {
+            baseCanciones.agregarCancion(new Cancion(titulo, artista, duracion));
+            System.out.println("Canción agregada correctamente.");
         }
 
-        baseCanciones.agregarCancion(new Cancion(titulo, artista, duracion));
-        System.out.println("Canción agregada correctamente.");
         pressEnterToContinue();
     }
 
