@@ -1,3 +1,11 @@
+/*
+ * Bernardino José Payeras Molina
+ * 0900-24-3363
+ * Programacion 1
+ * Examen Final
+ * Reproductor de Música
+ */
+
 import java.util.Scanner;
 
 public class ReproductorMusica {
@@ -173,6 +181,111 @@ public class ReproductorMusica {
         System.out.println("Canción asignada correctamente a la playlist.");
         pressEnterToContinue();
     }
+
+    public static void verInformacion() {
+        int opcion;
+        do {
+            clearScreen();
+            System.out.println("=== VER INFORMACIÓN ===");
+            System.out.println("1. Ver canciones registradas");
+            System.out.println("2. Ver playlists creadas");
+            System.out.println("3. Ver playlists con sus canciones");
+            System.out.println("4. Volver al menú principal");
+
+            opcion = leerOpcion(1, 4);
+            clearScreen();
+
+            switch (opcion) {
+                case 1 -> {
+                    System.out.println("=== CANCIONES REGISTRADAS ===");
+                    baseCanciones.mostrarCancionesConIndice();
+                    pressEnterToContinue();
+                }
+                case 2 -> {
+                    System.out.println("=== PLAYLISTS CREADAS ===");
+                    basePlaylists.mostrarPlaylistsConIndice();
+                    pressEnterToContinue();
+                }
+                case 3 -> {
+                    System.out.println("=== PLAYLISTS CON SUS CANCIONES ===");
+                    basePlaylists.mostrarPlaylistsConCanciones();
+                    pressEnterToContinue();
+                }
+                case 4 -> System.out.println("Volviendo al menú principal...");
+            }
+        } while (opcion != 4);
+    }
+
+    public static void buscarCancion() {
+        clearScreen();
+        System.out.println("=== BUSCAR CANCIÓN POR TÍTULO ===");
+        System.out.print("Ingrese el título de la canción: ");
+        String titulo = scanner.nextLine().trim();
+
+        Cancion cancion = baseCanciones.buscarCancion(titulo);
+        if (cancion == null) {
+            System.out.println("Canción no encontrada.");
+        } else {
+            System.out.println("Título: " + cancion.titulo);
+            System.out.println("Artista: " + cancion.artista);
+            System.out.println("Duración: " + cancion.duracion + "s");
+            System.out.println("Presente en las siguientes playlists:");
+            basePlaylists.listarPresenciaCancion(cancion);
+        }
+
+        pressEnterToContinue();
+    }
+
+    public static void eliminarCancion() {
+        clearScreen();
+        if (baseCanciones.estaVacia()) {
+            System.out.println("No hay canciones registradas.");
+            pressEnterToContinue();
+            return;
+        }
+
+        System.out.println("Seleccione la canción a eliminar:");
+        baseCanciones.mostrarCancionesConIndice();
+        int index = leerOpcion(1, Integer.MAX_VALUE) - 1;
+        Cancion cancion = baseCanciones.obtenerCancionPorIndice(index);
+
+        if (cancion == null) {
+            System.out.println("Índice inválido.");
+            pressEnterToContinue();
+            return;
+        }
+
+        System.out.println("¿Desea eliminar la canción de:");
+        System.out.println("1. Toda la base y playlists");
+        System.out.println("2. Solo de una playlist específica");
+        int opcion = leerOpcion(1, 2);
+
+        switch (opcion) {
+            case 1 -> {
+                baseCanciones.eliminarCancion(cancion);
+                basePlaylists.eliminarCancionDeTodas(cancion);
+                System.out.println("Canción eliminada completamente.");
+            }
+            case 2 -> {
+                Playlist[] playlists = basePlaylists.obtenerPlaylistsConCancion(cancion);
+                if (playlists.length == 0) {
+                    System.out.println("Esta canción no está en ninguna playlist.");
+                    break;
+                }
+
+                for (int i = 0; i < playlists.length; i++) {
+                    System.out.println((i + 1) + ". " + playlists[i].nombre);
+                }
+
+                int sel = leerOpcion(1, playlists.length);
+                basePlaylists.eliminarCancionDePlaylist(playlists[sel - 1], cancion);
+                System.out.println("Canción eliminada de la playlist seleccionada.");
+            }
+        }
+
+        pressEnterToContinue();
+    }
+
 }
 
 class Cancion {
@@ -232,38 +345,38 @@ class ListaCanciones {
     }
 
     public Cancion obtenerCancionPorIndice(int index) {
-    Cancion actual = cabeza;
-    int i = 0;
-    while (actual != null) {
-        if (i == index)
-            return actual;
-        actual = actual.siguiente;
-        i++;
-    }
-    return null;
-}
-
-public void eliminarCancion(Cancion c) {
-    if (cabeza == null)
-        return;
-
-    if (cabeza == c) {
-        cabeza = cabeza.siguiente;
-        return;
+        Cancion actual = cabeza;
+        int i = 0;
+        while (actual != null) {
+            if (i == index)
+                return actual;
+            actual = actual.siguiente;
+            i++;
+        }
+        return null;
     }
 
-    Cancion anterior = cabeza;
-    Cancion actual = cabeza.siguiente;
+    public void eliminarCancion(Cancion c) {
+        if (cabeza == null)
+            return;
 
-    while (actual != null) {
-        if (actual == c) {
-            anterior.siguiente = actual.siguiente;
+        if (cabeza == c) {
+            cabeza = cabeza.siguiente;
             return;
         }
-        anterior = actual;
-        actual = actual.siguiente;
+
+        Cancion anterior = cabeza;
+        Cancion actual = cabeza.siguiente;
+
+        while (actual != null) {
+            if (actual == c) {
+                anterior.siguiente = actual.siguiente;
+                return;
+            }
+            anterior = actual;
+            actual = actual.siguiente;
+        }
     }
-}
 
 }
 
