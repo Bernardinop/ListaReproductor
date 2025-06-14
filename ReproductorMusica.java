@@ -39,7 +39,10 @@ public class ReproductorMusica {
             switch (opcion) {
                 case 1 -> crearPlaylist();
                 case 2 -> agregarCancionGeneral();
-
+                case 3 -> asignarCancionAPlaylist();
+                //case 4 -> verInformacion();
+                //case 5 -> buscarCancion();
+                //case 6 -> eliminarCancion();
                 case 7 -> System.out.println("Saliendo...");
             }
         } while (opcion != 7);
@@ -98,8 +101,10 @@ public class ReproductorMusica {
             System.out.print("Duración en segundos: ");
             try {
                 duracion = Integer.parseInt(scanner.nextLine());
-                if (duracion > 0) break;
-                else System.out.println("Ingrese un número mayor a 0.");
+                if (duracion > 0)
+                    break;
+                else
+                    System.out.println("Ingrese un número mayor a 0.");
             } catch (Exception e) {
                 System.out.println("Entrada inválida. Solo se permiten números enteros.");
             }
@@ -112,6 +117,60 @@ public class ReproductorMusica {
 
         baseCanciones.agregarCancion(new Cancion(titulo, artista, duracion));
         System.out.println("Canción agregada correctamente.");
+        pressEnterToContinue();
+    }
+
+    public static void asignarCancionAPlaylist() {
+        clearScreen();
+        if (baseCanciones.estaVacia() || basePlaylists.estaVacia()) {
+            System.out.println("Debe haber al menos una canción y una playlist para asignar.");
+            pressEnterToContinue();
+            return;
+        }
+
+        System.out.println("Seleccione una canción:");
+        baseCanciones.mostrarCancionesConIndice();
+        int indexCancion = leerOpcion(1, Integer.MAX_VALUE) - 1;
+        Cancion cancion = baseCanciones.obtenerCancionPorIndice(indexCancion);
+        if (cancion == null) {
+            System.out.println("Índice de canción inválido.");
+            pressEnterToContinue();
+            return;
+        }
+
+        System.out.println("Seleccione una playlist:");
+        basePlaylists.mostrarPlaylistsConIndice();
+        int indexPlaylist = leerOpcion(1, Integer.MAX_VALUE) - 1;
+        Playlist playlist = basePlaylists.obtenerPlaylistPorIndice(indexPlaylist);
+        if (playlist == null) {
+            System.out.println("Índice de playlist inválido.");
+            pressEnterToContinue();
+            return;
+        }
+
+        // Verificar si la canción ya está en la playlist
+        NodoCancion actual = playlist.cabeza;
+        while (actual != null) {
+            if (actual.cancion == cancion) {
+                System.out.println("La canción ya está en la playlist.");
+                pressEnterToContinue();
+                return;
+            }
+            actual = actual.siguiente;
+        }
+
+        NodoCancion nuevoNodo = new NodoCancion(cancion);
+        if (playlist.cabeza == null) {
+            playlist.cabeza = nuevoNodo;
+        } else {
+            actual = playlist.cabeza;
+            while (actual.siguiente != null) {
+                actual = actual.siguiente;
+            }
+            actual.siguiente = nuevoNodo;
+        }
+
+        System.out.println("Canción asignada correctamente a la playlist.");
         pressEnterToContinue();
     }
 }
@@ -176,7 +235,8 @@ class ListaCanciones {
         Cancion actual = cabeza;
         int i = 0;
         while (actual != null) {
-            if (i == index) return actual;
+            if (i == index)
+                return actual;
             actual = actual.siguiente;
             i++;
         }
@@ -239,7 +299,8 @@ class ListaPlaylists {
         Playlist actual = cabeza;
         int i = 0;
         while (actual != null) {
-            if (i == index) return actual;
+            if (i == index)
+                return actual;
             actual = actual.siguiente;
             i++;
         }
