@@ -40,9 +40,9 @@ public class ReproductorMusica {
                 case 1 -> crearPlaylist();
                 case 2 -> agregarCancionGeneral();
                 case 3 -> asignarCancionAPlaylist();
-                //case 4 -> verInformacion();
-                //case 5 -> buscarCancion();
-                //case 6 -> eliminarCancion();
+                case 4 -> verInformacion();
+                case 5 -> buscarCancion();
+                case 6 -> eliminarCancion();
                 case 7 -> System.out.println("Saliendo...");
             }
         } while (opcion != 7);
@@ -232,16 +232,39 @@ class ListaCanciones {
     }
 
     public Cancion obtenerCancionPorIndice(int index) {
-        Cancion actual = cabeza;
-        int i = 0;
-        while (actual != null) {
-            if (i == index)
-                return actual;
-            actual = actual.siguiente;
-            i++;
-        }
-        return null;
+    Cancion actual = cabeza;
+    int i = 0;
+    while (actual != null) {
+        if (i == index)
+            return actual;
+        actual = actual.siguiente;
+        i++;
     }
+    return null;
+}
+
+public void eliminarCancion(Cancion c) {
+    if (cabeza == null)
+        return;
+
+    if (cabeza == c) {
+        cabeza = cabeza.siguiente;
+        return;
+    }
+
+    Cancion anterior = cabeza;
+    Cancion actual = cabeza.siguiente;
+
+    while (actual != null) {
+        if (actual == c) {
+            anterior.siguiente = actual.siguiente;
+            return;
+        }
+        anterior = actual;
+        actual = actual.siguiente;
+    }
+}
+
 }
 
 class Playlist {
@@ -306,4 +329,115 @@ class ListaPlaylists {
         }
         return null;
     }
+
+    public void mostrarPlaylistsConCanciones() {
+        Playlist actual = cabeza;
+        if (actual == null) {
+            System.out.println("No hay playlists disponibles.");
+            return;
+        }
+
+        while (actual != null) {
+            System.out.println("Playlist: " + actual.nombre);
+            NodoCancion nodo = actual.cabeza;
+            if (nodo == null) {
+                System.out.println("  (Sin canciones)");
+            } else {
+                while (nodo != null) {
+                    Cancion c = nodo.cancion;
+                    System.out.println("  - " + c.titulo + " / " + c.artista + " (" + c.duracion + "s)");
+                    nodo = nodo.siguiente;
+                }
+            }
+            System.out.println("--------------------");
+            actual = actual.siguiente;
+        }
+    }
+
+    public void listarPresenciaCancion(Cancion c) {
+        Playlist actual = cabeza;
+        boolean encontrada = false;
+
+        while (actual != null) {
+            NodoCancion nodo = actual.cabeza;
+            while (nodo != null) {
+                if (nodo.cancion == c) {
+                    System.out.println("- " + actual.nombre);
+                    encontrada = true;
+                    break;
+                }
+                nodo = nodo.siguiente;
+            }
+            actual = actual.siguiente;
+        }
+
+        if (!encontrada) {
+            System.out.println("No se encuentra en ninguna playlist.");
+        }
+    }
+
+    public void eliminarCancionDeTodas(Cancion c) {
+        Playlist actual = cabeza;
+        while (actual != null) {
+            eliminarCancionDePlaylist(actual, c);
+            actual = actual.siguiente;
+        }
+    }
+
+    public void eliminarCancionDePlaylist(Playlist p, Cancion c) {
+        if (p.cabeza == null)
+            return;
+
+        if (p.cabeza.cancion == c) {
+            p.cabeza = p.cabeza.siguiente;
+            return;
+        }
+
+        NodoCancion anterior = p.cabeza;
+        NodoCancion actual = p.cabeza.siguiente;
+
+        while (actual != null) {
+            if (actual.cancion == c) {
+                anterior.siguiente = actual.siguiente;
+                return;
+            }
+            anterior = actual;
+            actual = actual.siguiente;
+        }
+    }
+
+    public Playlist[] obtenerPlaylistsConCancion(Cancion c) {
+        int contador = 0;
+        Playlist actual = cabeza;
+        while (actual != null) {
+            NodoCancion nodo = actual.cabeza;
+            while (nodo != null) {
+                if (nodo.cancion == c) {
+                    contador++;
+                    break;
+                }
+                nodo = nodo.siguiente;
+            }
+            actual = actual.siguiente;
+        }
+
+        Playlist[] resultado = new Playlist[contador];
+        actual = cabeza;
+        int i = 0;
+
+        while (actual != null) {
+            NodoCancion nodo = actual.cabeza;
+            while (nodo != null) {
+                if (nodo.cancion == c) {
+                    resultado[i++] = actual;
+                    break;
+                }
+                nodo = nodo.siguiente;
+            }
+            actual = actual.siguiente;
+        }
+
+        return resultado;
+    }
+
 }
