@@ -8,7 +8,7 @@
 
 import java.util.Scanner;
 
-public class ReproductorMusica {
+public class ReproductorMain {
 
     static Scanner scanner = new Scanner(System.in);
     static ListaCanciones baseCanciones = new ListaCanciones();
